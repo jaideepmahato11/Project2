@@ -113,6 +113,20 @@ app.get('/api/health', (req, res) => {
   res.json({ success: true, message: 'Backend is running' })
 })
 
+// Debug: MongoDB connection status (safe to expose temporarily for troubleshooting)
+app.get('/api/debug/mongo', (req, res) => {
+  try {
+    const state = mongoose.connection.readyState // 0 = disconnected, 1 = connected, 2 = connecting, 3 = disconnecting
+    res.json({
+      success: true,
+      readyState: state,
+      stateText: state === 0 ? 'disconnected' : state === 1 ? 'connected' : state === 2 ? 'connecting' : 'disconnecting'
+    })
+  } catch (err) {
+    res.json({ success: false, message: err && err.message ? err.message : String(err) })
+  }
+})
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err)
