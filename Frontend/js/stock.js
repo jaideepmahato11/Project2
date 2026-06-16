@@ -89,8 +89,9 @@ const companies = [
     }
 ];
 
-const TRADE_API_URL = "/api/trades";
-const STOCK_API_URL = "/api/stocks";
+const API_BASE_URL = import.meta.env?.VITE_API_URL || 'https://your-backend-project.vercel.app';
+const TRADE_API_URL = `${API_BASE_URL}/api/trades`;
+const STOCK_API_URL = `${API_BASE_URL}/api/stocks`;
 
 const dom = {
     companyList: document.getElementById("companyList"),
@@ -729,131 +730,6 @@ function attachEvents() {
     }
 }
 
-function renderList(filter = "") {
-    const query = filter.trim().toLowerCase();
-    dom.companyList.innerHTML = "";
-
-    companies
-        .filter((company) => company.name.toLowerCase().includes(query) || company.id.toLowerCase().includes(query))
-        .forEach((company) => {
-            const li = document.createElement("li");
-            li.className = "company-item";
-
-            const button = document.createElement("button");
-            button.type = "button";
-            button.dataset.symbol = company.id;
-
-            const meta = document.createElement("span");
-            meta.className = "company-meta";
-
-            const logo = document.createElement("img");
-            logo.className = "company-logo";
-            logo.src = "../img/" + (companyLogos[company.id] || "L1.jpg");
-            logo.alt = company.name + " logo";
-            logo.loading = "lazy";
-
-            const name = document.createElement("span");
-            name.className = "company-name";
-            name.textContent = company.name;
-
-            const price = document.createElement("span");
-            price.className = "company-price";
-            const quote = quoteCache.get(company.id);
-            price.textContent = quote && quote.price !== null ? formatPriceCompact(quote.price) : formatPriceCompact(company.basePrice);
-
-            const change = document.createElement("span");
-            const changeValue = quote && Number.isFinite(Number(quote.changePercent)) ? Number(quote.changePercent) : company.dayChange;
-            change.className = "company-change " + (changeValue >= 0 ? "positive" : "negative");
-            change.textContent = formatPercent(changeValue);
-
-            meta.appendChild(logo);
-            meta.appendChild(name);
-            meta.appendChild(price);
-
-            button.appendChild(meta);
-            button.appendChild(change);
-
-            button.addEventListener("click", () => {
-                selectCompany(company.id);
-            });
-
-            li.appendChild(button);
-            dom.companyList.appendChild(li);
-        });
-
-    const firstButton = dom.companyList.querySelector("button");
-    if (firstButton && !dom.companyList.querySelector("button.active")) {
-        selectCompany(firstButton.dataset.symbol);
-    }
-}
-
-function selectCompany(symbol) {
-    const found = companies.find((company) => company.id === symbol);
-    if (!found) {
-        return;
-    }
-
-    activeCompany = found;
-    const quote = quoteCache.get(symbol);
-    quotePrice = quote && quote.price !== null ? quote.price : activeCompany.basePrice;
-    updateOverview(activeCompany, quotePrice, quote || {});
-    renderCandlestickChart(activeCompany, activeInterval);
-
-    const allButtons = dom.companyList.querySelectorAll("button");
-    allButtons.forEach((button) => {
-        button.classList.toggle("active", button.dataset.symbol === symbol);
-    });
-}
-
-function updateClock() {
-    const now = new Date();
-    dom.clockValue.textContent = now.toLocaleTimeString("en-IN", { hour12: false });
-
-    const day = now.getDay();
-    const hour = now.getHours();
-    marketOpen = day > 0 && day < 6 && hour >= 9 && hour < 16;
-    dom.marketState.textContent = marketOpen ? "Market Open" : "Market Closed";
-    dom.statusVal.textContent = marketOpen ? "Open" : "Closed";
-}
-
-async function loadMarketQuotes() {
-    try {
-        const response = await fetch(`${STOCK_API_URL}/quotes?symbols=${Object.keys(yahooSymbols).join(",")}`);
-        const data = await response.json();
-
-        if (!data.success || !Array.isArray(data.quotes)) {
-            throw new Error(data.message || "Failed to fetch quotes");
-        }
-
-        data.quotes.forEach((quote) => {
-            quoteCache.set(quote.symbol, quote);
-            const company = companies.find((item) => item.id === quote.symbol);
-            if (company) {
-                if (quote.price !== null) {
-                    company.basePrice = quote.price;
-                }
-                if (Number.isFinite(Number(quote.changePercent))) {
-                    company.dayChange = Number(quote.changePercent);
-                }
-                if (Number.isFinite(Number(quote.volume))) {
-                    company.volume = Number(quote.volume);
-                }
-                refreshCompanyRow(company, quote);
-            }
-        });
-
-        const activeQuote = quoteCache.get(activeCompany.id);
-        if (activeQuote && activeQuote.price !== null) {
-            quotePrice = activeQuote.price;
-            updateOverview(activeCompany, quotePrice, activeQuote);
-        }
-
-        renderList(dom.search.value);
-    } catch (error) {
-        console.error("[STOCK PAGE] Failed to load Yahoo quotes:", error);
-    }
-}
-
 function init() {
     attachEvents();
     updateClock();
@@ -890,3 +766,7 @@ function init() {
 }
 
 init();
+
+window.closeModal = closeModal;
+window.closeResponseModal = closeResponseModal;
+

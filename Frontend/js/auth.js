@@ -1,4 +1,4 @@
-const API_URL = import.meta.env?.VITE_API_URL || 'http://localhost:4002';
+const API_URL = import.meta.env?.VITE_API_URL || 'https://your-backend-project.vercel.app';
 const AUTH_API_URL = `${API_URL}/api/auth`;
 
 // Open Signup Modal
