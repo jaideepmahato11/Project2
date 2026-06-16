@@ -65,7 +65,7 @@ async function requireMongoConnection(req, res, next) {
 // Middleware
 app.use(cors({
   origin(origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
+    if (!origin || origin === 'null' || allowedOrigins.includes(origin)) {
       callback(null, true)
       return
     }
