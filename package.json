@@ -1,0 +1,13 @@
+{
+  "name": "stocksphere-workspace",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npm --prefix Backend start",
+    "dev": "npm --prefix Backend run dev",
+    "backend:start": "npm --prefix Backend start",
+    "backend:dev": "npm --prefix Backend run dev",
+    "frontend:dev": "npm --prefix Frontend run dev",
+    "frontend:start": "npm --prefix Frontend start"
+  }
+}

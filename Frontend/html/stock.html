@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>StockSphere Pulse Board</title>
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="../css/stock.css">
+	<script src="https://unpkg.com/lightweight-charts/dist/lightweight-charts.standalone.production.js"></script>
+</head>
+
+<body>
+	<header class="topbar">
+		<div class="topbar-brand">
+			<img src="../img/U.jpg" alt="StockSphere Logo" class="logo">
+			<span>StockSphere - Invest with Confidence</span>
+		</div>
+		<div class="topbar-meta">Yahoo Finance quotes and candles</div>
+	</header>
+
+	<div class="dashboard-layout">
+		<aside class="sidebar">
+			<h2>Top Companies</h2>
+			<input id="companySearch" type="text" placeholder="Search company..." aria-label="Search company">
+			<ul id="companyList" class="company-list"></ul>
+
+			<div class="sidebar-links">
+				<a href="index.html">Back to Home</a>
+				<a href="about.html">About</a>
+			</div>
+		</aside>
+
+		<main class="board">
+			<section class="card company-overview">
+				<div class="company-overview-meta">
+					<img id="companyMainLogo" class="company-main-logo" src="../img/L1.jpg" alt="Reliance Industries logo">
+					<div>
+						<p class="label" id="symbolLabel">NSE: RELIANCE</p>
+						<h1 id="companyName">Reliance Industries</h1>
+						<p id="companySector" class="muted">Energy</p>
+						<p id="companyCeo" class="muted">CEO: Mukesh Ambani</p>
+					</div>
+				</div>
+				<div class="price-box">
+					<p id="lastPrice" class="price">Rs 2,785.6</p>
+					<p id="priceChange" class="change positive">+32.4 (+1.18%)</p>
+				</div>
+			</section>
+
+			<section class="card chart-section">
+				<div class="chart-head">
+					<h3>Chart</h3>
+					<div class="chart-subtitle" id="chartSubtitle">NSE: RELIANCE · 30m</div>
+					<div class="range-buttons" id="rangeButtons">
+						<button data-interval="1">1m</button>
+						<button data-interval="30" class="active">30m</button>
+						<button data-interval="60">1h</button>
+					</div>
+				</div>
+				<div class="tradingview-widget-shell">
+					<div id="tradingview_chart" class="tradingview-widget-container" aria-label="Candlestick chart"></div>
+				</div>
+				<div class="chart-footer">
+					<span id="marketState">Market Open</span>
+					<span id="clockValue">--:--:--</span>
+					<a id="chartSourceLink" class="chart-source-link" href="https://finance.yahoo.com/" target="_blank" rel="noopener noreferrer">Source</a>
+				</div>
+			</section>
+
+			<section class="card action-bar">
+				<div>
+					<h3>Trading Actions</h3>
+					<div class="trade-values">
+						<p>Buy Price <strong id="buyPrice">Rs 2,786.1</strong></p>
+						<p>Sell Price <strong id="sellPrice">Rs 2,785.1</strong></p>
+					</div>
+				</div>
+				<div class="actions">
+					<button class="btn-buy" type="button">Buy</button>
+					<button class="btn-sell" type="button">Sell</button>
+				</div>
+			</section>
+
+			<section class="metric-grid">
+				<article class="card metric-card">
+					<h4>Key Metrics</h4>
+					<p>Open <strong id="openVal">Rs 2,753.2</strong></p>
+					<p>High <strong id="highVal">Rs 2,795.4</strong></p>
+					<p>Low <strong id="lowVal">Rs 2,748.1</strong></p>
+					<p>Volume <strong id="volumeVal">3.2M</strong></p>
+				</article>
+
+				<article class="card metric-card">
+					<h4>Market Status</h4>
+					<p>Market <strong id="statusVal">Open</strong></p>
+					<p>Exchange <strong id="exchangeVal">NSE</strong></p>
+					<p>Updated <strong id="updatedVal">Just now</strong></p>
+					<p>Signal <strong id="signalVal">Bullish</strong></p>
+				</article>
+
+				<article class="card metric-card">
+					<h4>Performance</h4>
+					<p>1D <strong id="perf1d" class="positive">+1.18%</strong></p>
+					<p>1W <strong id="perf1w" class="positive">+2.45%</strong></p>
+					<p>1M <strong id="perf1m" class="negative">-1.83%</strong></p>
+					<p>3M <strong id="perf3m" class="positive">+4.26%</strong></p>
+				</article>
+			</section>
+		</main>
+	</div>
+
+	<!-- Footer -->
+	<footer>
+		<p>© 2026 StockSphere. All rights reserved.</p>
+	</footer>
+
+	<!-- Trading Modal -->
+	<div id="tradingModal" class="modal" style="display: none;">
+		<div class="modal-content">
+			<h2 id="formTitle">Buy TCS</h2>
+			<form id="tradingForm">
+				<label for="quantity">Quantity</label>
+				<input type="number" id="quantity" value="10" min="1" required>
+
+				<label for="orderType">Order Type</label>
+				<select id="orderType">
+					<option value="market">Market Order</option>
+					<option value="limit">Limit Order</option>
+				</select>
+
+				<label for="transactionType">Transaction Type</label>
+				<select id="transactionType">
+					<option value="intraday">Intraday</option>
+					<option value="delivery">Delivery</option>
+				</select>
+
+				<label for="price">Price</label>
+				<input type="text" id="price" readonly>
+
+				<label for="estimatedCost">Estimated Cost</label>
+				<input type="text" id="estimatedCost" readonly>
+
+				<label for="upiId">UPI ID</label>
+				<input type="text" id="upiId" placeholder="yourname@upi" required>
+
+				<p id="tradeMessage" class="muted" aria-live="polite"></p>
+
+				<button id="placeOrderBtn" class="btn-primary-modal" type="submit">Place Order</button>
+				<button class="btn-cancel-modal" type="button" onclick="closeModal()">Cancel</button>
+			</form>
+		</div>
+	</div>
+
+	<!-- Response Modal -->
+	<div id="responseModal" class="modal" style="display: none;">
+		<div class="modal-content" style="max-width: 500px;">
+			<h2 id="responseTitle">Order Placed Successfully</h2>
+			<div id="responseBody" style="font-size: 14px; line-height: 1.8; color: #333;">
+				<!-- Response content will be inserted here -->
+			</div>
+			<button class="btn-primary-modal" type="button" onclick="closeResponseModal()">Close</button>
+		</div>
+	</div>
+
+	<script src="../js/stock.js"></script>
+</body>
+
+</html>

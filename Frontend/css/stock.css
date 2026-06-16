@@ -1,0 +1,675 @@
+:root {
+    --bg: #ecf1f9;
+    --panel: #ffffff;
+    --line: #d8e2f0;
+    --text: #172744;
+    --muted: #6f7d97;
+    --brand: #12335d;
+    --accent: #0e8fca;
+    --up: #0b9e54;
+    --down: #d83737;
+    --sidebar: #e3ebfb;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Poppins", sans-serif;
+    background: radial-gradient(circle at top right, #f6fbff, var(--bg));
+    color: var(--text);
+}
+
+.topbar {
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 22px;
+    background: linear-gradient(90deg, #13233f 0%, #1f5c78 55%, #84aab4 100%);
+    color: #eaf3ff;
+    font-weight: 600;
+}
+
+.topbar-brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    letter-spacing: 0.2px;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    object-fit: cover;
+}
+
+.topbar-meta {
+    font-size: 0.82rem;
+    opacity: 0.9;
+}
+
+.dashboard-layout {
+    display: grid;
+    grid-template-columns: 280px 1fr;
+    min-height: calc(100vh - 56px);
+}
+
+.sidebar {
+    background: var(--sidebar);
+    border-right: 1px solid #ced9ee;
+    padding: 18px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.sidebar h2 {
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.sidebar input {
+    width: 100%;
+    border: 1px solid #c9d6ee;
+    border-radius: 9px;
+    padding: 11px 12px;
+    font-size: 0.95rem;
+    background: #f7faff;
+}
+
+.company-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    gap: 8px;
+    overflow: auto;
+    max-height: calc(100vh - 245px);
+}
+
+.company-item button {
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    padding: 11px 10px;
+    text-align: left;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    background: transparent;
+    color: #1e3152;
+    font-family: inherit;
+}
+
+.company-item button:hover,
+.company-item button.active {
+    background: #d4e3ff;
+    outline: 1px solid #96b7ef;
+}
+
+.company-name {
+    font-weight: 500;
+    font-size: 0.94rem;
+}
+
+.company-price {
+    margin-left: auto;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #27405f;
+}
+
+.company-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+    flex: 1;
+}
+
+.company-logo {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #b8c9e7;
+    background: #eef4ff;
+    flex-shrink: 0;
+}
+
+.company-change {
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+.positive {
+    color: var(--up);
+}
+
+.negative {
+    color: var(--down);
+}
+
+.sidebar-links {
+    margin-top: auto;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.sidebar-links a {
+    color: #224674;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.board {
+    max-width: 1040px;
+    width: 100%;
+    margin: 26px auto;
+    display: grid;
+    gap: 16px;
+    padding: 0 18px 28px;
+}
+
+.card {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 15px;
+    box-shadow: 0 7px 18px rgba(24, 43, 74, 0.05);
+}
+
+.company-overview {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    gap: 10px;
+}
+
+.company-overview-meta {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.company-main-logo {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #b8c9e7;
+    background: #eef4ff;
+    flex-shrink: 0;
+}
+
+.label {
+    margin: 0;
+    color: #46648c;
+    font-size: 0.88rem;
+    font-weight: 600;
+}
+
+h1 {
+    margin: 2px 0;
+    font-size: clamp(1.35rem, 2vw, 1.95rem);
+}
+
+.muted {
+    margin: 3px 0;
+    color: var(--muted);
+}
+
+.price-box {
+    text-align: right;
+}
+
+.price {
+    margin: 0;
+    font-size: clamp(1.4rem, 2.2vw, 2rem);
+    font-weight: 700;
+}
+
+.change {
+    margin: 5px 0 0;
+    font-weight: 600;
+}
+
+.chart-section {
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+}
+
+.chart-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 10px 14px;
+    margin-bottom: 8px;
+    padding: 0 8px;
+}
+
+.chart-head h3,
+.action-bar h3,
+.metric-card h4 {
+    margin: 0;
+}
+
+.chart-subtitle {
+    margin-right: auto;
+    color: #5b6d8c;
+    font-size: 0.92rem;
+    font-weight: 600;
+}
+
+.range-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.range-buttons button {
+    border: 1px solid #b8c7e2;
+    background: #f6f9ff;
+    border-radius: 8px;
+    padding: 7px 11px;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 600;
+}
+
+.range-buttons button.active {
+    background: #d5e4ff;
+    border-color: #7fa6e8;
+}
+
+
+.tradingview-widget-shell {
+    position: relative;
+    border-radius: 10px;
+    border: 1px solid #e2e9f5;
+    overflow: hidden;
+    background: linear-gradient(180deg, #f7faff 0%, #f2f7ff 100%);
+    flex: 1;
+}
+
+.tradingview-widget-container {
+    width: 100%;
+    min-height: 640px;
+    height: 640px;
+}
+
+.chart-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 8px;
+    padding: 0 8px 2px;
+    color: #536887;
+    font-weight: 500;
+}
+
+.chart-source-link {
+    margin-left: auto;
+    color: #2752a3;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.chart-source-link:hover {
+    text-decoration: underline;
+}
+
+.action-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 20px;
+}
+
+.trade-values {
+    display: flex;
+    gap: 20px;
+    color: #5c6f8d;
+    font-size: 0.94rem;
+}
+
+.trade-values p {
+    margin: 7px 0 0;
+}
+
+.trade-values strong {
+    display: block;
+    color: var(--text);
+    font-size: 1.22rem;
+}
+
+.actions {
+    display: flex;
+    gap: 10px;
+}
+
+.actions button {
+    border: none;
+    border-radius: 10px;
+    color: #fff;
+    font-weight: 700;
+    font-size: 1.02rem;
+    padding: 14px 20px;
+    cursor: pointer;
+}
+
+.btn-buy {
+    background: #10a35a;
+}
+
+.btn-sell {
+    background: #d82f2f;
+}
+
+.metric-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(190px, 1fr));
+    gap: 12px;
+}
+
+.metric-card {
+    padding: 16px;
+}
+
+.metric-card p {
+    margin: 8px 0;
+    color: #5f7090;
+    font-size: 0.95rem;
+    display: flex;
+    justify-content: space-between;
+}
+
+.metric-card strong {
+    color: var(--text);
+}
+
+@media (max-width: 1080px) {
+    .dashboard-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .sidebar {
+        border-right: none;
+        border-bottom: 1px solid #ced9ee;
+    }
+
+    .company-list {
+        max-height: 270px;
+    }
+}
+
+/* Modal Styling */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    width: 100%;
+    max-width: 580px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    max-height: 90vh;
+    overflow-y: auto;
+}
+
+.modal-step {
+    display: none;
+}
+
+.modal-step.active {
+    display: block;
+}
+
+.modal-content h2 {
+    margin: 0 0 24px;
+    font-size: 1.8rem;
+    text-align: center;
+    color: #0a1f44;
+}
+
+.modal-content label {
+    display: block;
+    margin: 16px 0 8px;
+    font-weight: 600;
+    color: #172744;
+    font-size: 0.95rem;
+}
+
+.modal-content input,
+.modal-content select {
+    width: 100%;
+    border: 1px solid #c9d6ee;
+    border-radius: 10px;
+    padding: 12px;
+    font-size: 0.95rem;
+    font-family: inherit;
+    background: #f0f5ff;
+}
+
+.modal-content input:focus,
+.modal-content select:focus {
+    outline: none;
+    border-color: #0e8fca;
+    background: #f7faff;
+}
+
+.btn-primary-modal,
+.btn-success-modal,
+.btn-cancel-modal {
+    width: 100%;
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    margin-top: 16px;
+    font-family: inherit;
+}
+
+.btn-primary-modal {
+    background: #0b9e54;
+    color: white;
+}
+
+.btn-success-modal {
+    background: #0066cc;
+    color: white;
+}
+
+.btn-cancel-modal {
+    background: #d82f2f;
+    color: white;
+    margin-top: 8px;
+}
+
+.checkout-items {
+    background: #f0f5ff;
+    border-radius: 12px;
+    padding: 16px;
+    margin: 20px 0;
+}
+
+.checkout-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    font-size: 0.95rem;
+    color: #172744;
+}
+
+.checkout-row-total {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    margin-top: 8px;
+    padding-top: 12px;
+    border-top: 2px solid #d8e2f0;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: #0a1f44;
+}
+
+.success-box {
+    text-align: center;
+    padding: 30px;
+}
+
+.success-icon {
+    width: 80px;
+    height: 80px;
+    background: #0b9e54;
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3rem;
+    margin: 0 auto 20px;
+}
+
+.success-box h2 {
+    margin: 0;
+    color: #0a1f44;
+    font-size: 1.5rem;
+}
+
+@media (max-width: 760px) {
+    .topbar {
+        padding: 0 12px;
+        font-size: 0.88rem;
+    }
+
+    .topbar-meta {
+        display: none;
+    }
+
+    .company-overview,
+    .action-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .company-overview-meta {
+        align-items: center;
+    }
+
+    .chart-head {
+        align-items: flex-start;
+    }
+
+    .chart-subtitle {
+        width: 100%;
+        margin-right: 0;
+    }
+
+    .price-box {
+        text-align: left;
+    }
+
+    .metric-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .trade-values {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .tradingview-widget-container {
+        min-height: 520px;
+        height: 520px;
+    }
+
+    .modal-content {
+        width: 90%;
+        padding: 24px;
+        margin: 0 15px;
+    }
+}
+
+/* Footer Styling */
+.sub-footer {
+    background: #f0f8fa;
+    border-top: 1px solid var(--line);
+    padding: 40px 24px;
+    margin-top: 40px;
+}
+
+.sub-footer-grid {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 30px;
+}
+
+.footer-brand h3,
+.footer-links h3,
+.footer-contact h3 {
+    margin: 0 0 12px;
+    color: var(--text);
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.footer-brand p {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.footer-links a,
+.footer-contact p {
+    display: block;
+    margin: 8px 0;
+    color: var(--muted);
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.footer-links a:hover {
+    color: var(--accent);
+    text-decoration: underline;
+}
+
+.footer-contact p {
+    margin: 6px 0;
+}
+
+footer {
+    background: linear-gradient(90deg, #13233f 0%, #1f5c78 55%, #84aab4 100%);
+    color: white;
+    text-align: center;
+    padding: 20px;
+    font-size: 0.9rem;
+}
+
+footer p {
+    margin: 0;
+}
