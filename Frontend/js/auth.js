@@ -1,6 +1,10 @@
 const LOCAL_API_URL = 'http://localhost:4002';
 const REMOTE_API_URL = 'https://project2-ckif.vercel.app';
-const isLocalHost = typeof window !== 'undefined' && ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname);
+const isLocalHost = typeof window !== 'undefined' && (
+    window.location.protocol === 'file:' ||
+    !window.location.hostname ||
+    ['localhost', '127.0.0.1', '::1'].includes(window.location.hostname)
+);
 const buildTimeApiUrl = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : '';
 const API_URL = isLocalHost ? LOCAL_API_URL : buildTimeApiUrl || REMOTE_API_URL;
 const AUTH_API_URL = `${API_URL}/api/auth`;
