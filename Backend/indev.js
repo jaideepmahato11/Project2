@@ -67,9 +67,6 @@ app.use((req, res, next) => {
 if (mongoUri) {
   console.log('[MONGO] Connecting to MongoDB...')
   mongoose.connect(mongoUri, {
-    // modern connection options
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
     serverSelectionTimeoutMS: 10000 // short timeout for faster failure reporting
   })
     .then(() => {

@@ -1,5 +1,6 @@
 const express = require('express')
 const jwt = require('jsonwebtoken')
+const bcryptjs = require('bcryptjs')
 const User = require('../models/User')
 
 const router = express.Router()
@@ -87,17 +88,35 @@ router.post('/signup', async (req, res) => {
 router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body
+    const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : ''
 
-    if (!email || !password) {
+    if (!normalizedEmail || !password) {
       return res.json({ success: false, message: 'Email and password are required' })
     }
 
-    const user = await User.findOne({ email })
+    const user = await User.findOne({ email: normalizedEmail })
     if (!user) {
       return res.json({ success: false, message: 'Invalid email or password' })
     }
 
-    const isPasswordValid = await user.comparePassword(password)
+    let isPasswordValid = false
+
+    if (typeof user.comparePassword === 'function') {
+      try {
+        isPasswordValid = await user.comparePassword(password)
+      } catch (compareError) {
+        console.warn('[AUTH ROUTES] comparePassword failed, falling back to bcrypt.compare:', compareError.message)
+      }
+    }
+
+    if (!isPasswordValid && typeof user.password === 'string' && user.password.length > 0) {
+      try {
+        isPasswordValid = await bcryptjs.compare(password, user.password)
+      } catch (bcryptError) {
+        console.warn('[AUTH ROUTES] bcrypt.compare failed:', bcryptError.message)
+      }
+    }
+
     if (!isPasswordValid) {
       return res.json({ success: false, message: 'Invalid email or password' })
     }
@@ -119,8 +138,12 @@ router.post('/login', async (req, res) => {
       }
     })
   } catch (error) {
-    console.error('Login error:', error)
-    res.json({ success: false, message: 'An error occurred during login' })
+    console.error('[AUTH ROUTES] LOGIN ERROR:', error.message)
+    console.error('[AUTH ROUTES] Error stack:', error.stack)
+    res.json({
+      success: false,
+      message: `An error occurred during login: ${error.message}`
+    })
   }
 })
 
