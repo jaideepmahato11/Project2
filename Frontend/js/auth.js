@@ -141,7 +141,11 @@ async function handleLogin(event) {
         } else {
             messageDiv.className = 'message error';
             messageDiv.textContent = data && data.message ? data.message : 'Login failed. Please try again.';
-            console.error('Login response:', data);
+            try {
+                console.error('Login response:', JSON.stringify(data));
+            } catch (e) {
+                console.error('Login response (object):', data);
+            }
         }
     } catch (error) {
         messageDiv.className = 'message error';
