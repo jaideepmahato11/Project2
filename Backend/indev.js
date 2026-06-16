@@ -63,16 +63,31 @@ app.use((req, res, next) => {
 })
 
 //Database connection
+//Database connection
 if (mongoUri) {
-  mongoose.connect(mongoUri)
+  console.log('[MONGO] Connecting to MongoDB...')
+  mongoose.connect(mongoUri, {
+    // modern connection options
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    serverSelectionTimeoutMS: 10000 // short timeout for faster failure reporting
+  })
     .then(() => {
-      console.log('Connected to MongoDB')
+      console.log('[MONGO] Connected to MongoDB')
     })
     .catch((error) => {
-      console.error('Error connecting to MongoDB:', error)
+      console.error('[MONGO] Error connecting to MongoDB:', error && error.message ? error.message : error)
     })
+
+  mongoose.connection.on('error', (err) => {
+    console.error('[MONGO] Connection error:', err && err.message ? err.message : err)
+  })
+
+  mongoose.connection.on('disconnected', () => {
+    console.warn('[MONGO] Disconnected from MongoDB')
+  })
 } else {
-  console.warn('MONGO_URI is not set; skipping MongoDB connection')
+  console.warn('[MONGO] MONGO_URI is not set; skipping MongoDB connection')
 }
 
 // Routes
