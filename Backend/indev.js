@@ -40,6 +40,28 @@ const allowedOrigins = [
   'http://127.0.0.1:3001'
 ].filter(Boolean)
 
+let mongoConnectionPromise = Promise.resolve()
+
+async function requireMongoConnection(req, res, next) {
+  if (!mongoUri) {
+    res.status(503).json({ success: false, message: 'Database is not configured' })
+    return
+  }
+
+  try {
+    await mongoConnectionPromise
+
+    if (mongoose.connection.readyState !== 1) {
+      throw new Error('MongoDB is not ready')
+    }
+
+    next()
+  } catch (error) {
+    console.error('[MONGO] Request blocked until database was ready:', error.message)
+    res.status(503).json({ success: false, message: 'Database connection unavailable', error: error.message })
+  }
+}
+
 // Middleware
 app.use(cors({
   origin(origin, callback) {
@@ -66,8 +88,8 @@ app.use((req, res, next) => {
 //Database connection
 if (mongoUri) {
   console.log('[MONGO] Connecting to MongoDB...')
-  mongoose.connect(mongoUri, {
-    serverSelectionTimeoutMS: 10000 // short timeout for faster failure reporting
+  mongoConnectionPromise = mongoose.connect(mongoUri, {
+    serverSelectionTimeoutMS: 5000 // fail fast if the database is unreachable
   })
     .then(() => {
       console.log('[MONGO] Connected to MongoDB')
@@ -89,11 +111,11 @@ if (mongoUri) {
 
 // Routes
 console.log('Loading auth routes...')
-app.use('/api/auth', authRoutes)
+app.use('/api/auth', requireMongoConnection, authRoutes)
 console.log('Auth routes loaded successfully')
 
 console.log('Loading trade routes...')
-app.use('/api/trades', tradeRoutes)
+app.use('/api/trades', requireMongoConnection, tradeRoutes)
 console.log('Trade routes loaded successfully')
 
 console.log('Loading stock routes...')
@@ -130,10 +152,14 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, message: 'Server error', error: err.message })
 })
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-})
+if (process.env.VERCEL !== '1' && process.env.VERCEL !== 'true') {
+  app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+  })
+}
 
 app.get("/", (req, res) => {
   res.send("StockSphere Backend Running 🚀");
 });
+
+module.exports = app
