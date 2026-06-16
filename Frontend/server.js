@@ -16,7 +16,7 @@ function readEnvValue(filePath, key) {
   return line ? line.slice(key.length + 1).trim() : undefined
 }
 
-const backendBaseUrl = process.env.VITE_API_URL || readEnvValue(envPath, 'VITE_API_URL') || 'https://your-backend-project.vercel.app'
+const backendBaseUrl = process.env.VITE_API_URL || readEnvValue(envPath, 'VITE_API_URL') || 'https://project2-ckif.vercel.app'
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'html')))

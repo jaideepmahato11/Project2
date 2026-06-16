@@ -89,7 +89,7 @@ const companies = [
     }
 ];
 
-const API_BASE_URL = import.meta.env?.VITE_API_URL || 'https://your-backend-project.vercel.app';
+const API_BASE_URL = import.meta.env?.VITE_API_URL || 'https://project2-ckif.vercel.app';
 const TRADE_API_URL = `${API_BASE_URL}/api/trades`;
 const STOCK_API_URL = `${API_BASE_URL}/api/stocks`;
 
