@@ -5,6 +5,40 @@ const buildTimeApiUrl = typeof import.meta !== 'undefined' && import.meta.env &&
 const API_URL = isLocalHost ? LOCAL_API_URL : buildTimeApiUrl || REMOTE_API_URL;
 const AUTH_API_URL = `${API_URL}/api/auth`;
 
+async function fetchAuthJson(endpoint, options) {
+    const candidateBases = [API_URL]
+    if (API_URL !== LOCAL_API_URL) {
+        candidateBases.push(LOCAL_API_URL)
+    }
+
+    let lastResponse = null
+    let lastData = null
+
+    for (const baseUrl of candidateBases) {
+        try {
+            const response = await fetch(`${baseUrl}/api/auth${endpoint}`, options)
+            const data = await response.json().catch(() => ({}))
+
+            lastResponse = response
+            lastData = data
+
+            if (response.ok) {
+                return { response, data, baseUrl }
+            }
+
+            if (response.status !== 503 || baseUrl === LOCAL_API_URL) {
+                return { response, data, baseUrl }
+            }
+        } catch (error) {
+            if (baseUrl === LOCAL_API_URL) {
+                throw error
+            }
+        }
+    }
+
+    return { response: lastResponse, data: lastData, baseUrl: candidateBases[candidateBases.length - 1] }
+}
+
 // Open Signup Modal
 function openSignupModal() {
     document.getElementById('signupModal').classList.add('show');
@@ -55,7 +89,7 @@ async function handleSignup(event) {
     const messageDiv = document.getElementById('signupMessage');
     
     try {
-        const response = await fetch(`${AUTH_API_URL}/signup`, {
+        const { response, data } = await fetchAuthJson('/signup', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -74,8 +108,6 @@ async function handleSignup(event) {
             console.error('Response status:', response.status);
             return;
         }
-        
-        const data = await response.json();
         
         if (data && data.success) {
             messageDiv.className = 'message success';
@@ -109,7 +141,7 @@ async function handleLogin(event) {
     const messageDiv = document.getElementById('loginMessage');
     
     try {
-        const response = await fetch(`${AUTH_API_URL}/login`, {
+        const { response, data } = await fetchAuthJson('/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -126,8 +158,6 @@ async function handleLogin(event) {
             console.error('Response status:', response.status);
             return;
         }
-        
-        const data = await response.json();
         
         if (data && data.success) {
             messageDiv.className = 'message success';

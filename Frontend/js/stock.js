@@ -97,6 +97,40 @@ const API_BASE_URL = isLocalHost ? LOCAL_API_URL : buildTimeApiUrl || REMOTE_API
 const TRADE_API_URL = `${API_BASE_URL}/api/trades`;
 const STOCK_API_URL = `${API_BASE_URL}/api/stocks`;
 
+async function fetchWithFallback(path, options) {
+    const candidateBases = [API_BASE_URL]
+    if (API_BASE_URL !== LOCAL_API_URL) {
+        candidateBases.push(LOCAL_API_URL)
+    }
+
+    let lastResponse = null
+    let lastData = null
+
+    for (const baseUrl of candidateBases) {
+        try {
+            const response = await fetch(`${baseUrl}${path}`, options)
+            const data = await response.json().catch(() => ({}))
+
+            lastResponse = response
+            lastData = data
+
+            if (response.ok) {
+                return { response, data, baseUrl }
+            }
+
+            if (response.status !== 503 || baseUrl === LOCAL_API_URL) {
+                return { response, data, baseUrl }
+            }
+        } catch (error) {
+            if (baseUrl === LOCAL_API_URL) {
+                throw error
+            }
+        }
+    }
+
+    return { response: lastResponse, data: lastData, baseUrl: candidateBases[candidateBases.length - 1] }
+}
+
 const dom = {
     companyList: document.getElementById("companyList"),
     search: document.getElementById("companySearch"),
@@ -311,9 +345,8 @@ function renderCandlestickChart(company, interval) {
         dom.chartSourceLink.textContent = "Source";
     }
 
-    fetch(`${STOCK_API_URL}/${encodeURIComponent(company.id)}?range=${encodeURIComponent(rangeConfig.range)}&interval=${encodeURIComponent(rangeConfig.interval)}`)
-        .then((response) => response.json())
-        .then((data) => {
+    fetchWithFallback(`/${encodeURIComponent(company.id)}?range=${encodeURIComponent(rangeConfig.range)}&interval=${encodeURIComponent(rangeConfig.interval)}`)
+        .then(({ data }) => {
             if (!data.success) {
                 throw new Error(data.message || "Failed to load chart data");
             }
@@ -367,8 +400,7 @@ function refreshCompanyRow(company, quote) {
 
 async function loadMarketQuotes() {
     try {
-        const response = await fetch(`${STOCK_API_URL}/quotes?symbols=${Object.keys(yahooSymbols).join(",")}`);
-        const data = await response.json();
+        const { data } = await fetchWithFallback(`/quotes?symbols=${Object.keys(yahooSymbols).join(",")}`);
 
         if (!data.success || !Array.isArray(data.quotes)) {
             throw new Error(data.message || "Failed to fetch quotes");
@@ -601,15 +633,13 @@ async function placeOrder(event) {
     };
 
     try {
-        const response = await fetch(TRADE_API_URL + "/order", {
+        const { data } = await fetchWithFallback("/order", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify(payload)
         });
-
-        const data = await response.json();
 
         if (!data.success) {
             throw new Error(data.message || "Failed to place order");
