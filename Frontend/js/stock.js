@@ -349,7 +349,7 @@ function renderCandlestickChart(company, interval) {
         dom.chartSourceLink.textContent = "Source";
     }
 
-    fetchWithFallback(`/${encodeURIComponent(company.id)}?range=${encodeURIComponent(rangeConfig.range)}&interval=${encodeURIComponent(rangeConfig.interval)}`)
+    fetchWithFallback(`/api/stocks/${encodeURIComponent(company.id)}?range=${encodeURIComponent(rangeConfig.range)}&interval=${encodeURIComponent(rangeConfig.interval)}`)
         .then(({ data }) => {
             if (!data.success) {
                 throw new Error(data.message || "Failed to load chart data");
