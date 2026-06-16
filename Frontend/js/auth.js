@@ -1,4 +1,5 @@
-const API_URL = 'http://localhost:4002/api/auth';
+const API_URL = import.meta.env?.VITE_API_URL || 'http://localhost:4002';
+const AUTH_API_URL = `${API_URL}/api/auth`;
 
 // Open Signup Modal
 function openSignupModal() {
@@ -50,7 +51,7 @@ async function handleSignup(event) {
     const messageDiv = document.getElementById('signupMessage');
     
     try {
-        const response = await fetch(`${API_URL}/signup`, {
+        const response = await fetch(`${AUTH_API_URL}/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -104,7 +105,7 @@ async function handleLogin(event) {
     const messageDiv = document.getElementById('loginMessage');
     
     try {
-        const response = await fetch(`${API_URL}/login`, {
+        const response = await fetch(`${AUTH_API_URL}/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -161,3 +162,12 @@ window.onclick = function(event) {
         closeLoginModal();
     }
 }
+
+window.openSignupModal = openSignupModal;
+window.closeSignupModal = closeSignupModal;
+window.openLoginModal = openLoginModal;
+window.closeLoginModal = closeLoginModal;
+window.switchToSignup = switchToSignup;
+window.switchToLogin = switchToLogin;
+window.handleSignup = handleSignup;
+window.handleLogin = handleLogin;
