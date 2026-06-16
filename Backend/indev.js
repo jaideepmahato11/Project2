@@ -33,9 +33,26 @@ if (envResult.error) {
 
 const port = process.env.PORT || 3000
 const mongoUri = envResult.parsed?.MONGO_URI || process.env.MONGO_URI
+const frontendUrl = envResult.parsed?.FRONTEND_URL || process.env.FRONTEND_URL
+const allowedOrigins = [
+  frontendUrl,
+  'http://localhost:3001',
+  'http://127.0.0.1:3001'
+].filter(Boolean)
 
 // Middleware
-app.use(cors())
+app.use(cors({
+  origin(origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true)
+      return
+    }
+
+    callback(new Error(`CORS blocked for origin: ${origin}`))
+  },
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 

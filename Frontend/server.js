@@ -1,8 +1,22 @@
 const express = require('express')
 const path = require('path')
+const fs = require('fs')
 
 const app = express()
 const PORT = 3001
+const envPath = path.join(__dirname, '.env')
+
+function readEnvValue(filePath, key) {
+  if (!fs.existsSync(filePath)) {
+    return undefined
+  }
+
+  const content = fs.readFileSync(filePath, 'utf8')
+  const line = content.split(/\r?\n/).find((item) => item.startsWith(`${key}=`))
+  return line ? line.slice(key.length + 1).trim() : undefined
+}
+
+const backendBaseUrl = process.env.VITE_API_URL || readEnvValue(envPath, 'VITE_API_URL') || 'https://your-backend-project.vercel.app'
 
 // Serve static files
 app.use(express.static(path.join(__dirname, 'html')))
@@ -14,7 +28,7 @@ app.use(express.json())
 // Forward trade requests to backend
 app.post('/api/trades/order', async (req, res) => {
   try {
-    const backendResponse = await fetch('http://localhost:4002/api/trades/order', {
+    const backendResponse = await fetch(`${backendBaseUrl}/api/trades/order`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -32,7 +46,7 @@ app.post('/api/trades/order', async (req, res) => {
 app.get('/api/trades/orders', async (req, res) => {
   try {
     const query = req.query.userId ? `?userId=${req.query.userId}` : ''
-    const backendResponse = await fetch(`http://localhost:4002/api/trades/orders${query}`)
+    const backendResponse = await fetch(`${backendBaseUrl}/api/trades/orders${query}`)
     const data = await backendResponse.json()
     res.json(data)
   } catch (error) {
@@ -48,7 +62,7 @@ app.get('/api/trades/test', (req, res) => {
 app.get('/api/stocks/quotes', async (req, res) => {
   try {
     const query = req.query.symbols ? `?symbols=${encodeURIComponent(req.query.symbols)}` : ''
-    const backendResponse = await fetch(`http://localhost:4002/api/stocks/quotes${query}`)
+    const backendResponse = await fetch(`${backendBaseUrl}/api/stocks/quotes${query}`)
     const data = await backendResponse.json()
     res.json(data)
   } catch (error) {
@@ -68,7 +82,7 @@ app.get('/api/stocks/:symbol', async (req, res) => {
     }
 
     const query = params.toString() ? `?${params.toString()}` : ''
-    const backendResponse = await fetch(`http://localhost:4002/api/stocks/${encodeURIComponent(req.params.symbol)}${query}`)
+    const backendResponse = await fetch(`${backendBaseUrl}/api/stocks/${encodeURIComponent(req.params.symbol)}${query}`)
     const data = await backendResponse.json()
     res.json(data)
   } catch (error) {
