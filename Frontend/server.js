@@ -18,7 +18,7 @@ function readEnvValue(filePath, key) {
 
 const isProduction = process.env.NODE_ENV === 'production'
 const backendBaseUrl = isProduction
-  ? (process.env.VITE_API_URL || readEnvValue(envPath, 'VITE_API_URL') || 'https://project2-ckif.vercel.app')
+  ? (process.env.VITE_API_URL || readEnvValue(envPath, 'VITE_API_URL') || 'https://project2-vhg7.vercel.app')
   : (process.env.BACKEND_URL || readEnvValue(envPath, 'BACKEND_URL') || 'http://localhost:4002')
 
 // Serve static files

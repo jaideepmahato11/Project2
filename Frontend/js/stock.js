@@ -90,7 +90,7 @@ const companies = [
 ];
 
 const LOCAL_API_URL = 'http://localhost:4002';
-const REMOTE_API_URL = 'https://project2-ckif.vercel.app';
+const REMOTE_API_URL = 'https://project2-vhg7.vercel.app';
 const isLocalHost = typeof window !== 'undefined' && (
     window.location.protocol === 'file:' ||
     !window.location.hostname ||
