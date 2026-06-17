@@ -648,7 +648,7 @@ async function placeOrder(event) {
     };
 
     try {
-        const { data } = await fetchWithFallback("/order", {
+        const { data } = await fetchWithFallback("/api/trades/order", {
             method: "POST",
             headers: getAuthHeaders(),
             body: JSON.stringify(payload)
