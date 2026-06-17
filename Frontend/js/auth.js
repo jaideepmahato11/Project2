@@ -10,6 +10,21 @@ const API_URL = isLocalHost ? LOCAL_API_URL : (buildTimeApiUrl || REMOTE_API_URL
 console.log('[AUTH] Using API URL:', API_URL, 'isLocalHost:', isLocalHost);
 const AUTH_API_URL = `${API_URL}/api/auth`;
 
+function getDisplayErrorMessage(response, data, fallbackMessage) {
+    const backendError = data && typeof data.error === 'string' && data.error.trim() ? data.error.trim() : '';
+    const backendMessage = data && typeof data.message === 'string' && data.message.trim() ? data.message.trim() : '';
+
+    if (backendError) {
+        return `${backendMessage || fallbackMessage}: ${backendError}`;
+    }
+
+    if (backendMessage) {
+        return backendMessage;
+    }
+
+    return response ? `Server error: ${response.status}` : fallbackMessage;
+}
+
 async function fetchAuthJson(endpoint, options) {
     const candidateBases = [API_URL]
     if (isLocalHost && API_URL !== LOCAL_API_URL) {
@@ -121,7 +136,7 @@ async function handleSignup(event) {
         }
         
         messageDiv.className = 'message error';
-        messageDiv.textContent = data && data.message ? data.message : `Server error: ${response ? response.status : 'unknown'}`;
+        messageDiv.textContent = getDisplayErrorMessage(response, data, 'Server error');
         console.error('Signup response:', data);
     } catch (error) {
         messageDiv.className = 'message error';
@@ -165,7 +180,7 @@ async function handleLogin(event) {
         }
         
         messageDiv.className = 'message error';
-        messageDiv.textContent = data && data.message ? data.message : `Server error: ${response ? response.status : 'unknown'}`;
+        messageDiv.textContent = getDisplayErrorMessage(response, data, 'Server error');
         try {
             console.error('Login response:', JSON.stringify(data));
         } catch (e) {
