@@ -236,13 +236,17 @@ async function loadPortfolio() {
         return;
     }
 
+function redirectToLogin() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    window.location.href = 'index.html';
+}
+
     try {
         const { response, data } = await fetchWithFallback('/api/trades/orders');
 
         if (response && response.status === 401) {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            window.location.href = 'index.html';
+            redirectToLogin();
             return;
         }
 
