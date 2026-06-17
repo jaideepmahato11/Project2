@@ -92,7 +92,7 @@ const AUTH_API_URL = `${API_URL}/api/auth`;
 
 async function fetchAuthJson(endpoint, options) {
     const candidateBases = [API_URL]
-    if (API_URL !== LOCAL_API_URL) {
+    if (isLocalHost && API_URL !== LOCAL_API_URL) {
         candidateBases.push(LOCAL_API_URL)
     }
 

@@ -104,7 +104,7 @@ const STOCK_API_URL = `${API_BASE_URL}/api/stocks`;
 
 async function fetchWithFallback(path, options) {
     const candidateBases = [API_BASE_URL]
-    if (API_BASE_URL !== LOCAL_API_URL) {
+    if (isLocalHost && API_BASE_URL !== LOCAL_API_URL) {
         candidateBases.push(LOCAL_API_URL)
     }
 
