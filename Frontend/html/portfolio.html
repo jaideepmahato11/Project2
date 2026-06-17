@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StockSphere Portfolio</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/portfolio.css">
+</head>
+<body>
+    <header class="portfolio-header">
+        <div class="brand-wrap">
+            <img src="../img/U.jpg" alt="StockSphere Logo" class="brand-logo">
+            <div>
+                <p class="eyebrow">StockSphere Portfolio</p>
+                <h1 id="welcomeTitle">Your Holdings and Activity</h1>
+            </div>
+        </div>
+        <nav class="portfolio-nav">
+            <a href="index.html">Home</a>
+            <a href="stock.html">Trade Desk</a>
+            <a href="portfolio.html" class="active">Portfolio</a>
+        </nav>
+    </header>
+
+    <main class="portfolio-shell">
+        <section class="hero-card">
+            <div>
+                <p class="eyebrow">Logged-in account view</p>
+                <h2>See every buy, sell, and action tied to your account.</h2>
+                <p class="hero-copy">This page reads your authenticated trade history and turns it into a compact portfolio view with current positions, totals, and a full activity log.</p>
+            </div>
+            <div class="hero-actions">
+                <a class="primary-link" href="stock.html">Go to Trade Desk</a>
+                <button id="refreshButton" class="secondary-link" type="button">Refresh Data</button>
+            </div>
+        </section>
+
+        <section class="summary-grid" aria-label="Portfolio summary">
+            <article class="summary-card">
+                <span>Total Actions</span>
+                <strong id="totalActions">0</strong>
+                <small id="latestAction">No activity yet</small>
+            </article>
+            <article class="summary-card">
+                <span>Total Buy Value</span>
+                <strong id="totalBuyValue">Rs 0.00</strong>
+                <small>Gross value of all buy orders</small>
+            </article>
+            <article class="summary-card">
+                <span>Total Sell Value</span>
+                <strong id="totalSellValue">Rs 0.00</strong>
+                <small>Gross value of all sell orders</small>
+            </article>
+            <article class="summary-card">
+                <span>Net Position Value</span>
+                <strong id="netValue">Rs 0.00</strong>
+                <small>Buy value minus sell value</small>
+            </article>
+        </section>
+
+        <section class="content-grid">
+            <article class="panel">
+                <div class="panel-head">
+                    <div>
+                        <p class="eyebrow">Current Positions</p>
+                        <h3>Holdings by stock</h3>
+                    </div>
+                    <span id="holdingCount" class="panel-pill">0 holdings</span>
+                </div>
+                <div class="table-wrap">
+                    <table class="portfolio-table" aria-label="Current holdings table">
+                        <thead>
+                            <tr>
+                                <th>Stock</th>
+                                <th>Net Qty</th>
+                                <th>Buy Value</th>
+                                <th>Sell Value</th>
+                                <th>Net Value</th>
+                                <th>Last Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="holdingsBody">
+                            <tr>
+                                <td colspan="6" class="empty-state">Loading your holdings...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </article>
+
+            <article class="panel activity-panel">
+                <div class="panel-head">
+                    <div>
+                        <p class="eyebrow">Activity Feed</p>
+                        <h3>Every order actioned</h3>
+                    </div>
+                    <span id="activityCount" class="panel-pill">0 actions</span>
+                </div>
+                <div id="activityList" class="activity-list">
+                    <div class="empty-state">Loading activity...</div>
+                </div>
+            </article>
+        </section>
+    </main>
+
+    <script type="module" src="../js/portfolio.js"></script>
+</body>
+</html>
