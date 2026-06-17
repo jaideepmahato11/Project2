@@ -233,6 +233,19 @@ function applyPerfClass(node, value) {
     node.classList.add(value >= 0 ? "positive" : "negative");
 }
 
+function getAuthHeaders() {
+    const headers = {
+        "Content-Type": "application/json"
+    };
+
+    const token = localStorage.getItem("token");
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+
+    return headers;
+}
+
 function getYahooSymbol(symbol) {
     return yahooSymbols[symbol] || (String(symbol).toUpperCase() + ".NS");
 }
@@ -614,7 +627,8 @@ async function placeOrder(event) {
     }
 
     const userStr = localStorage.getItem("user");
-    if (!userStr) {
+    const token = localStorage.getItem("token");
+    if (!userStr || !token) {
         if (tradeMessage) {
             tradeMessage.textContent = "Please login first to place orders.";
             tradeMessage.classList.add("negative");
@@ -623,9 +637,6 @@ async function placeOrder(event) {
         return;
     }
 
-    const user = JSON.parse(userStr);
-    const userId = user.id;
-
     const payload = {
         symbol: activeCompany.id,
         side: currentTransactionType,
@@ -633,16 +644,13 @@ async function placeOrder(event) {
         price: Number(priceValue.toFixed(2)),
         orderType: orderTypeNode.value,
         transactionType: transactionTypeNode.value,
-        upiId,
-        userId
+        upiId
     };
 
     try {
         const { data } = await fetchWithFallback("/order", {
             method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
+            headers: getAuthHeaders(),
             body: JSON.stringify(payload)
         });
 

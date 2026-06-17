@@ -1,5 +1,6 @@
 const express = require('express')
 const Trade = require('../models/Trade')
+const authenticateUser = require('../middleware/authenticate')
 
 const router = express.Router()
 
@@ -18,10 +19,11 @@ router.get('/test', (req, res) => {
   res.json({ success: true, message: 'Trade routes test endpoint working!' })
 })
 
-router.post('/order', async (req, res) => {
+router.post('/order', authenticateUser, async (req, res) => {
   try {
     console.log('[TRADES] POST /order called with:', req.body)
-    const { symbol, side, quantity, price, orderType, transactionType, upiId, userId } = req.body
+    const { symbol, side, quantity, price, orderType, transactionType, upiId } = req.body
+    const userId = req.user?.id
 
     if (!symbol || !side || !quantity || !price || !orderType || !transactionType || !upiId || !userId) {
       return res.json({ success: false, message: 'All order fields are required' })
@@ -95,16 +97,9 @@ router.post('/order', async (req, res) => {
   }
 })
 
-router.get('/orders', async (req, res) => {
+router.get('/orders', authenticateUser, async (req, res) => {
   try {
-    const { userId } = req.query
-    
-    let query = {}
-    if (userId) {
-      query.userId = userId
-    }
-    
-    const trades = await Trade.find(query).sort({ createdAt: -1 })
+    const trades = await Trade.find({ userId: req.user.id }).sort({ createdAt: -1 })
     res.json({ success: true, orders: trades })
   } catch (error) {
     console.error('[TRADES ROUTES] GET ORDERS ERROR:', error)
@@ -112,9 +107,13 @@ router.get('/orders', async (req, res) => {
   }
 })
 
-router.get('/orders/:userId', async (req, res) => {
+router.get('/orders/:userId', authenticateUser, async (req, res) => {
   try {
     const { userId } = req.params
+
+    if (String(userId) !== String(req.user.id)) {
+      return res.status(403).json({ success: false, message: 'You can only view your own orders' })
+    }
     
     const trades = await Trade.find({ userId }).sort({ createdAt: -1 })
     res.json({ success: true, orders: trades })

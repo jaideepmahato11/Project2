@@ -126,6 +126,9 @@ async function handleSignup(event) {
             messageDiv.className = 'message success';
             messageDiv.textContent = data.message || 'Account created successfully';
             document.getElementById('signupForm').reset();
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+            }
             localStorage.setItem('user', JSON.stringify(data.user));
             setTimeout(() => {
                 closeSignupModal();
@@ -170,6 +173,9 @@ async function handleLogin(event) {
             messageDiv.className = 'message success';
             messageDiv.textContent = data.message || 'Login successful';
             document.getElementById('loginForm').reset();
+            if (data.token) {
+                localStorage.setItem('token', data.token);
+            }
             localStorage.setItem('user', JSON.stringify(data.user));
             setTimeout(() => {
                 closeLoginModal();

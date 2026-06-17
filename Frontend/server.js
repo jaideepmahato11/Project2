@@ -34,7 +34,8 @@ app.post('/api/trades/order', async (req, res) => {
     const backendResponse = await fetch(`${backendBaseUrl}/api/trades/order`, {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        ...(req.headers.authorization ? { Authorization: req.headers.authorization } : {})
       },
       body: JSON.stringify(req.body)
     })
@@ -48,8 +49,9 @@ app.post('/api/trades/order', async (req, res) => {
 
 app.get('/api/trades/orders', async (req, res) => {
   try {
-    const query = req.query.userId ? `?userId=${req.query.userId}` : ''
-    const backendResponse = await fetch(`${backendBaseUrl}/api/trades/orders${query}`)
+    const backendResponse = await fetch(`${backendBaseUrl}/api/trades/orders`, {
+      headers: req.headers.authorization ? { Authorization: req.headers.authorization } : {}
+    })
     const data = await backendResponse.json()
     res.json(data)
   } catch (error) {
