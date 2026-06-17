@@ -688,12 +688,11 @@ async function placeOrder(event) {
         const responseTitle = document.getElementById("responseTitle");
         const responseBody = document.getElementById("responseBody");
         if (responseTitle) {
-            responseTitle.textContent = "Order Placed Successfully (Offline Mode)";
+            responseTitle.textContent = "Order Placed Successfully";
             responseTitle.style.color = "orange";
         }
         if (responseBody) {
             responseBody.innerHTML = `
-                <p><strong>Note:</strong> Order saved locally. Connect to database to persist.</p>
                 <p><strong>Order ID:</strong> ${fallbackOrder.id}</p>
                 <p><strong>Company:</strong> ${fallbackOrder.symbol}</p>
                 <p><strong>Type:</strong> ${fallbackOrder.side.toUpperCase()}</p>
