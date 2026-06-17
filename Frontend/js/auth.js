@@ -8,6 +8,86 @@ const isLocalHost = typeof window !== 'undefined' && (
 const buildTimeApiUrl = typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_URL ? import.meta.env.VITE_API_URL : '';
 const API_URL = isLocalHost ? LOCAL_API_URL : (buildTimeApiUrl || REMOTE_API_URL);
 console.log('[AUTH] Using API URL:', API_URL, 'isLocalHost:', isLocalHost);
+const LOCAL_USERS_KEY = 'stocksphereUsers';
+
+function getStoredUsers() {
+    try {
+        return JSON.parse(localStorage.getItem(LOCAL_USERS_KEY) || '[]');
+    } catch (error) {
+        console.warn('[AUTH] Failed to parse local users cache:', error);
+        return [];
+    }
+}
+
+function saveStoredUsers(users) {
+    localStorage.setItem(LOCAL_USERS_KEY, JSON.stringify(users));
+}
+
+function getNormalizedEmail(email) {
+    return typeof email === 'string' ? email.trim().toLowerCase() : '';
+}
+
+function getLocalAuthError(response, data) {
+    if (!response || response.status === 503 || response.status >= 500) {
+        return true;
+    }
+
+    return Boolean(data && data.message && /connect to server|backend/i.test(data.message));
+}
+
+function createLocalUser(fullName, email, password) {
+    const normalizedEmail = getNormalizedEmail(email);
+    const users = getStoredUsers();
+
+    if (users.some((user) => user.email === normalizedEmail)) {
+        return { success: false, message: 'Email already registered locally' };
+    }
+
+    const user = {
+        id: `local-${Date.now()}`,
+        fullName: fullName.trim(),
+        email: normalizedEmail,
+        password
+    };
+
+    users.push(user);
+    saveStoredUsers(users);
+    localStorage.setItem('user', JSON.stringify({ id: user.id, fullName: user.fullName, email: user.email }));
+
+    return {
+        success: true,
+        message: 'Account created locally. Backend is unavailable right now.',
+        user: {
+            id: user.id,
+            fullName: user.fullName,
+            email: user.email
+        }
+    };
+}
+
+function loginLocalUser(email, password) {
+    const normalizedEmail = getNormalizedEmail(email);
+    const users = getStoredUsers();
+    const user = users.find((entry) => entry.email === normalizedEmail && entry.password === password);
+
+    if (!user) {
+        return { success: false, message: 'Invalid email or password' };
+    }
+
+    const sessionUser = {
+        id: user.id,
+        fullName: user.fullName,
+        email: user.email
+    };
+
+    localStorage.setItem('user', JSON.stringify(sessionUser));
+
+    return {
+        success: true,
+        message: 'Login successful (local mode)',
+        user: sessionUser
+    };
+}
 const AUTH_API_URL = `${API_URL}/api/auth`;
 
 async function fetchAuthJson(endpoint, options) {
@@ -106,30 +186,58 @@ async function handleSignup(event) {
                 confirmPassword
             })
         });
-        
-        if (!response.ok) {
-            messageDiv.className = 'message error';
-            messageDiv.textContent = `Server error: ${response.status}`;
-            console.error('Response status:', response.status);
-            return;
-        }
-        
-        if (data && data.success) {
+
+        if (response && response.ok && data && data.success) {
             messageDiv.className = 'message success';
             messageDiv.textContent = data.message || 'Account created successfully';
             document.getElementById('signupForm').reset();
-            
+            localStorage.setItem('user', JSON.stringify(data.user));
             setTimeout(() => {
                 closeSignupModal();
                 alert('Account created successfully! Please login.');
                 openLoginModal();
             }, 2000);
-        } else {
-            messageDiv.className = 'message error';
-            messageDiv.textContent = data && data.message ? data.message : 'Signup failed. Please try again.';
-            console.error('Signup response:', data);
+            return;
         }
+        
+        if (getLocalAuthError(response, data)) {
+            const localResult = createLocalUser(fullName, email, password);
+
+            if (localResult.success) {
+                messageDiv.className = 'message success';
+                messageDiv.textContent = localResult.message;
+                document.getElementById('signupForm').reset();
+                setTimeout(() => {
+                    closeSignupModal();
+                    alert('Account created locally. You can now log in.');
+                    openLoginModal();
+                }, 2000);
+                return;
+            }
+
+            messageDiv.className = 'message error';
+            messageDiv.textContent = localResult.message;
+            return;
+        }
+        
+        messageDiv.className = 'message error';
+        messageDiv.textContent = data && data.message ? data.message : `Server error: ${response ? response.status : 'unknown'}`;
+        console.error('Signup response:', data);
     } catch (error) {
+        const localResult = createLocalUser(fullName, email, password);
+
+        if (localResult.success) {
+            messageDiv.className = 'message success';
+            messageDiv.textContent = localResult.message;
+            document.getElementById('signupForm').reset();
+            setTimeout(() => {
+                closeSignupModal();
+                alert('Account created locally. You can now log in.');
+                openLoginModal();
+            }, 2000);
+            return;
+        }
+
         messageDiv.className = 'message error';
         messageDiv.textContent = 'Cannot connect to server. Is the backend running?';
         console.error('Signup error:', error);
@@ -156,37 +264,62 @@ async function handleLogin(event) {
                 password
             })
         });
-        
-        if (!response.ok) {
-            messageDiv.className = 'message error';
-            messageDiv.textContent = `Server error: ${response.status}`;
-            console.error('Response status:', response.status);
-            return;
-        }
-        
-        if (data && data.success) {
+
+        if (response && response.ok && data && data.success) {
             messageDiv.className = 'message success';
             messageDiv.textContent = data.message || 'Login successful';
             document.getElementById('loginForm').reset();
-            
-            // Store user info in localStorage
             localStorage.setItem('user', JSON.stringify(data.user));
-            
             setTimeout(() => {
                 closeLoginModal();
                 alert('Welcome ' + data.user.fullName + '!');
-                window.location.href = '/stock.html';
+                window.location.href = 'stock.html';
             }, 2000);
-        } else {
-            messageDiv.className = 'message error';
-            messageDiv.textContent = data && data.message ? data.message : 'Login failed. Please try again.';
-            try {
-                console.error('Login response:', JSON.stringify(data));
-            } catch (e) {
-                console.error('Login response (object):', data);
+            return;
+        }
+        
+        if (getLocalAuthError(response, data)) {
+            const localResult = loginLocalUser(email, password);
+
+            if (localResult.success) {
+                messageDiv.className = 'message success';
+                messageDiv.textContent = localResult.message;
+                document.getElementById('loginForm').reset();
+                setTimeout(() => {
+                    closeLoginModal();
+                    alert('Welcome ' + localResult.user.fullName + '!');
+                    window.location.href = 'stock.html';
+                }, 2000);
+                return;
             }
+
+            messageDiv.className = 'message error';
+            messageDiv.textContent = localResult.message;
+            return;
+        }
+        
+        messageDiv.className = 'message error';
+        messageDiv.textContent = data && data.message ? data.message : `Server error: ${response ? response.status : 'unknown'}`;
+        try {
+            console.error('Login response:', JSON.stringify(data));
+        } catch (e) {
+            console.error('Login response (object):', data);
         }
     } catch (error) {
+        const localResult = loginLocalUser(email, password);
+
+        if (localResult.success) {
+            messageDiv.className = 'message success';
+            messageDiv.textContent = localResult.message;
+            document.getElementById('loginForm').reset();
+            setTimeout(() => {
+                closeLoginModal();
+                alert('Welcome ' + localResult.user.fullName + '!');
+                window.location.href = 'stock.html';
+            }, 2000);
+            return;
+        }
+
         messageDiv.className = 'message error';
         messageDiv.textContent = 'Cannot connect to server. Is the backend running?';
         console.error('Login error:', error);
