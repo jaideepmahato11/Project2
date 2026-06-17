@@ -41,6 +41,8 @@ const allowedOrigins = [
 ].filter(Boolean)
 
 let mongoConnectionPromise = null
+let lastMongoError = null
+let lastMongoAttemptAt = null
 
 async function ensureMongoConnection() {
   if (!mongoUri) {
@@ -53,13 +55,16 @@ async function ensureMongoConnection() {
 
   if (!mongoConnectionPromise) {
     console.log('[MONGO] Establishing MongoDB connection...')
+    lastMongoAttemptAt = new Date().toISOString()
     mongoConnectionPromise = mongoose.connect(mongoUri, {
       serverSelectionTimeoutMS: 15000
     })
       .then(() => {
+        lastMongoError = null
         console.log('[MONGO] Connected to MongoDB')
       })
       .catch((error) => {
+        lastMongoError = error && error.message ? error.message : String(error)
         console.error('[MONGO] Error connecting to MongoDB:', error && error.message ? error.message : error)
         mongoConnectionPromise = null
         throw error
@@ -79,7 +84,12 @@ async function requireMongoConnection(req, res, next) {
     next()
   } catch (error) {
     console.error('[MONGO] Request blocked until database was ready:', error.message)
-    res.status(503).json({ success: false, message: 'Database connection unavailable', error: error.message })
+    res.status(503).json({
+      success: false,
+      message: 'Database connection unavailable',
+      error: lastMongoError || error.message,
+      lastMongoAttemptAt
+    })
   }
 }
 
@@ -166,7 +176,9 @@ app.get('/api/debug/config', (req, res) => {
     success: true,
     hasMongoUri: Boolean(mongoUri),
     hasFrontendUrl: Boolean(frontendUrl),
-    vercel: process.env.VERCEL === '1' || process.env.VERCEL === 'true'
+    vercel: process.env.VERCEL === '1' || process.env.VERCEL === 'true',
+    lastMongoAttemptAt,
+    mongoError: lastMongoError
   })
 })
 
