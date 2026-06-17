@@ -40,21 +40,42 @@ const allowedOrigins = [
   'http://127.0.0.1:3001'
 ].filter(Boolean)
 
-let mongoConnectionPromise = Promise.resolve()
+let mongoConnectionPromise = null
 
-async function requireMongoConnection(req, res, next) {
+async function ensureMongoConnection() {
   if (!mongoUri) {
-    res.status(503).json({ success: false, message: 'Database is not configured' })
+    throw new Error('Database is not configured')
+  }
+
+  if (mongoose.connection.readyState === 1) {
     return
   }
 
+  if (!mongoConnectionPromise) {
+    console.log('[MONGO] Establishing MongoDB connection...')
+    mongoConnectionPromise = mongoose.connect(mongoUri, {
+      serverSelectionTimeoutMS: 15000
+    })
+      .then(() => {
+        console.log('[MONGO] Connected to MongoDB')
+      })
+      .catch((error) => {
+        console.error('[MONGO] Error connecting to MongoDB:', error && error.message ? error.message : error)
+        mongoConnectionPromise = null
+        throw error
+      })
+  }
+
+  await mongoConnectionPromise
+
+  if (mongoose.connection.readyState !== 1) {
+    throw new Error('MongoDB is not ready')
+  }
+}
+
+async function requireMongoConnection(req, res, next) {
   try {
-    await mongoConnectionPromise
-
-    if (mongoose.connection.readyState !== 1) {
-      throw new Error('MongoDB is not ready')
-    }
-
+    await ensureMongoConnection()
     next()
   } catch (error) {
     console.error('[MONGO] Request blocked until database was ready:', error.message)
@@ -88,15 +109,9 @@ app.use((req, res, next) => {
 //Database connection
 if (mongoUri) {
   console.log('[MONGO] Connecting to MongoDB...')
-  mongoConnectionPromise = mongoose.connect(mongoUri, {
-    serverSelectionTimeoutMS: 5000 // fail fast if the database is unreachable
+  mongoConnectionPromise = ensureMongoConnection().catch((error) => {
+    console.error('[MONGO] Initial connection failed:', error && error.message ? error.message : error)
   })
-    .then(() => {
-      console.log('[MONGO] Connected to MongoDB')
-    })
-    .catch((error) => {
-      console.error('[MONGO] Error connecting to MongoDB:', error && error.message ? error.message : error)
-    })
 
   mongoose.connection.on('error', (err) => {
     console.error('[MONGO] Connection error:', err && err.message ? err.message : err)
