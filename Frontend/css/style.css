@@ -996,6 +996,44 @@ footer {
     box-sizing: border-box;
 }
 
+.modal-content .password-field {
+    display: flex;
+    align-items: stretch;
+}
+
+.modal-content .password-field input {
+    flex: 1;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+.modal-content .password-toggle {
+    border: 1.5px solid #e0e5f0;
+    border-left: 0;
+    border-radius: 0 8px 8px 0;
+    background: #f4f7fb;
+    color: #0a1f44;
+    min-width: 76px;
+    padding: 0 14px;
+    font-size: 0.95rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+.modal-content .password-toggle:hover,
+.modal-content .password-toggle:focus {
+    outline: none;
+    background: #eaf2ff;
+    border-color: #cdd8ea;
+}
+
+.modal-content .password-toggle.is-visible {
+    background: #0a1f44;
+    color: white;
+    border-color: #0a1f44;
+}
+
 .modal-content input:focus {
     outline: none;
     border-color: #00c973;

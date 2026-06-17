@@ -97,6 +97,39 @@ function switchToLogin(event) {
     openLoginModal();
 }
 
+function setPasswordVisibility(button, input, shouldShow) {
+    input.type = shouldShow ? 'text' : 'password';
+    button.textContent = shouldShow ? 'Hide' : 'Show';
+    button.classList.toggle('is-visible', shouldShow);
+    button.setAttribute('aria-pressed', String(shouldShow));
+    button.setAttribute('aria-label', shouldShow ? 'Hide password' : 'Show password');
+}
+
+function togglePasswordVisibility(button) {
+    const inputId = button.getAttribute('data-target');
+    const input = document.getElementById(inputId);
+
+    if (!input) {
+        return;
+    }
+
+    setPasswordVisibility(button, input, input.type === 'password');
+}
+
+function initPasswordVisibilityToggles() {
+    document.querySelectorAll('.password-toggle').forEach((button) => {
+        const inputId = button.getAttribute('data-target');
+        const input = document.getElementById(inputId);
+
+        if (!input) {
+            return;
+        }
+
+        button.addEventListener('click', () => togglePasswordVisibility(button));
+        setPasswordVisibility(button, input, false);
+    });
+}
+
 // Handle Signup
 async function handleSignup(event) {
     event.preventDefault();
@@ -220,3 +253,5 @@ window.switchToSignup = switchToSignup;
 window.switchToLogin = switchToLogin;
 window.handleSignup = handleSignup;
 window.handleLogin = handleLogin;
+
+initPasswordVisibilityToggles();

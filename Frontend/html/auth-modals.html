@@ -14,11 +14,17 @@
             </div>
             <div class="form-group">
                 <label for="signupPassword">Password:</label>
-                <input type="password" id="signupPassword" name="password" required>
+                <div class="password-field">
+                    <input type="password" id="signupPassword" name="password" required>
+                    <button type="button" class="password-toggle" data-target="signupPassword" aria-pressed="false" aria-label="Show password">Show</button>
+                </div>
             </div>
             <div class="form-group">
                 <label for="confirmPassword">Confirm Password:</label>
-                <input type="password" id="confirmPassword" name="confirmPassword" required>
+                <div class="password-field">
+                    <input type="password" id="confirmPassword" name="confirmPassword" required>
+                    <button type="button" class="password-toggle" data-target="confirmPassword" aria-pressed="false" aria-label="Show password">Show</button>
+                </div>
             </div>
             <div id="signupMessage" class="message"></div>
             <button type="submit" class="btn-submit">Sign Up</button>
@@ -39,7 +45,10 @@
             </div>
             <div class="form-group">
                 <label for="loginPassword">Password:</label>
-                <input type="password" id="loginPassword" name="password" required>
+                <div class="password-field">
+                    <input type="password" id="loginPassword" name="password" required>
+                    <button type="button" class="password-toggle" data-target="loginPassword" aria-pressed="false" aria-label="Show password">Show</button>
+                </div>
             </div>
             <div id="loginMessage" class="message"></div>
             <button type="submit" class="btn-submit">Login</button>
