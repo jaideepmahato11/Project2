@@ -146,6 +146,15 @@ app.get('/api/debug/mongo', (req, res) => {
   }
 })
 
+app.get('/api/debug/config', (req, res) => {
+  res.json({
+    success: true,
+    hasMongoUri: Boolean(mongoUri),
+    hasFrontendUrl: Boolean(frontendUrl),
+    vercel: process.env.VERCEL === '1' || process.env.VERCEL === 'true'
+  })
+})
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error:', err)
