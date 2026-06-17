@@ -130,6 +130,9 @@ async function handleSignup(event) {
                 localStorage.setItem('token', data.token);
             }
             localStorage.setItem('user', JSON.stringify(data.user));
+            if (typeof window.updateUserBadge === 'function') {
+                window.updateUserBadge();
+            }
             setTimeout(() => {
                 closeSignupModal();
                 alert('Account created successfully! Please login.');
@@ -177,6 +180,9 @@ async function handleLogin(event) {
                 localStorage.setItem('token', data.token);
             }
             localStorage.setItem('user', JSON.stringify(data.user));
+            if (typeof window.updateUserBadge === 'function') {
+                window.updateUserBadge();
+            }
             setTimeout(() => {
                 closeLoginModal();
                 alert('Welcome ' + data.user.fullName + '!');
