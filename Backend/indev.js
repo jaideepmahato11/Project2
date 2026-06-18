@@ -7,6 +7,7 @@ const cors = require('cors')
 let authRoutes
 let tradeRoutes
 let stockRoutes
+let contactRoutes
 try {
   // Clear module cache for auth routes to ensure fresh load
   delete require.cache[require.resolve('./routes/auth')]
@@ -18,6 +19,9 @@ try {
   delete require.cache[require.resolve('./routes/stocks')]
   stockRoutes = require('./routes/stocks')
   console.log('Stock routes imported successfully')
+  delete require.cache[require.resolve('./routes/contact')]
+  contactRoutes = require('./routes/contact')
+  console.log('Contact routes imported successfully')
 } catch (error) {
   console.error('Error importing auth routes:', error)
   process.exit(1)
@@ -146,6 +150,10 @@ console.log('Trade routes loaded successfully')
 console.log('Loading stock routes...')
 app.use('/api/stocks', stockRoutes)
 console.log('Stock routes loaded successfully')
+
+console.log('Loading contact routes...')
+app.use('/api/contact', requireMongoConnection, contactRoutes)
+console.log('Contact routes loaded successfully')
 
 // Test endpoint 2
 app.get('/api/test-direct', (req, res) => {
